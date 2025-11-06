@@ -1,17 +1,9 @@
-# Turtle Village — Lite (Student Scaffold)
-# Focus: loops, decisions, try/except, and small functions.
-# Run this file locally (IDLE/Thonny/PyCharm).
+# Turtle Village — Lite
+# By: Esther Arazi
+# Focus: loops, decisions, try/except, small functions, and turtle graphics.
 
-# ===>>>  REMOVE PASS IN ALL METHODS TO CODE
-
-# NOTE about Turtle coordinate axis.
-# turtle centers the origin (x == 0, y == 0 ) in the center of the canvas
-# so if our default screen size is : CANVAS_W, CANVAS_H = 800, 600
-#  the corners of your screen are :
-# Top-left: (-CANVAS_W/2, CANVAS_H/2) → (-400, 300)
-# Top-right: ( CANVAS_W/2, CANVAS_H/2) → ( 400, 300)
-# Bottom-left: (-CANVAS_W/2, -CANVAS_H/2) → (-400, -300)
-# Bottom-right: ( CANVAS_W/2, -CANVAS_H/2) → ( 400, -300)
+# This program draws a small "village" using user input for layout and theme.
+# It demonstrates loops, decisions, input validation, and function organization.
 
 import turtle as T
 import random
@@ -20,26 +12,15 @@ import random
 CANVAS_W, CANVAS_H = 800, 600
 TOP_MARGIN, BOTTOM_MARGIN = 40, 40
 
-# size of houses
+# size of houses - the width and the height of the house
 SIZES = {
     "s": (120, 80),
     "m": (150, 100),
     "l": (180, 120),
 }
 
-'''
-How to use Themes : 
-# Use a theme like this:
-colors = THEMES[theme_key]          # where theme_key is either "pastel" or "primary"
-body_c  = colors["body"]            # we then can access the colors for the body of the house
-roof_c  = colors["roof"]            # color of the roof of the house 
-door_c  = colors["door"]            # door 
-win_c   = colors["window"]          # window -- feel free to add or change the colors 
-                                    # there is are beautiful pallette choices at coolors.co
+# Color of the themes used in this program for the houses
 
-# how to apply :
-fill_rect_center(cx, cy, w, h, body_c)  # house body
-'''
 THEMES = {
     "pastel": dict(body="#ffd1dc", roof="#c1e1c1", door="#b5d3e7", window="#fff7ae"),
     "primary": dict(body="red", roof="blue", door="gold", window="#aee3ff"),
@@ -47,6 +28,7 @@ THEMES = {
 
 
 # ---------- tiny turtle helpers (provided) ----------
+# assigning tasks for the turtles for what and where to draw
 def move_to(x, y):
     '''
     x - position on x coordinate axis
@@ -120,7 +102,7 @@ def fill_circle_center(cx, cy, r, color):
 
 # ---------- input helpers ----------
 def ask_choice_int(prompt, allowed):
-    """Ask for an integer in the allowed set; reprompt on error."""
+    """Ask for a valid integer choice in the allowed set; reprompt until correct."""
     allowed_set = set(allowed)
     prompt = prompt + str(allowed_set) + ": "
     while True:
@@ -134,7 +116,7 @@ def ask_choice_int(prompt, allowed):
 
 
 def ask_choice_str(prompt, allowed):
-    """Ask for a string in the allowed list (case-insensitive); reprompt on error."""
+    """Ask for a string in the allowed list (case-insensitive); reprompt until correct."""
     allowed_lower = [a.lower() for a in allowed]
     prompt = prompt + str(allowed_lower) + ": "
     while True:
@@ -149,7 +131,7 @@ def ask_choice_str(prompt, allowed):
 
 # ---------- draw_roads ----------
 def draw_roads(cols, rows, cell_w, cell_h):
-    """Draw straight separator lines between rows and columns (simple roads)."""
+    """Draw simple horizontal and vertical lines for village roads."""
     top_y = CANVAS_H / 2 - TOP_MARGIN
     bot_y = -CANVAS_H / 2 + BOTTOM_MARGIN
     left_x = -CANVAS_W / 2
@@ -158,12 +140,12 @@ def draw_roads(cols, rows, cell_w, cell_h):
     T.pencolor("black")
     T.pensize(2)
 
-    # Horizontal lines
+    # Horizontal lines for rows
     for r in range(1, rows):
         y = top_y - r * cell_h
         draw_line(left_x, y, right_x, y)
 
-    # Vertical lines
+    # Vertical lines for columns
     for c in range(1, cols):
         x = left_x + c * cell_w
         draw_line(x, top_y, x, bot_y)
@@ -171,14 +153,14 @@ def draw_roads(cols, rows, cell_w, cell_h):
 
 # ---------- draw_house_centered ----------
 def draw_house_centered(cx, cy, size_key, theme_key, roof_style):
-    """Draw a simple house centered at (cx, cy)."""
+    """Draw a simple house centered at (cx, cy) with theme and roof style."""
     w, h = SIZES[size_key]
     colors = THEMES[theme_key]
 
-    # Body
+    # Draws main body of the house
     fill_rect_center(cx, cy, w, h, colors["body"])
 
-    # Roof
+    # Draws the roof based on the user's choice
     yT = cy + h / 2
     if roof_style == "triangle":
         p1 = (cx - w / 2, yT)
@@ -188,16 +170,17 @@ def draw_house_centered(cx, cy, size_key, theme_key, roof_style):
     else:
         fill_rect_center(cx, yT + h * 0.1, w, h * 0.2, colors["roof"])
 
-    # Door
+    # Draws doors
     door_w, door_h = w * 0.25, h * 0.52
     fill_rect_center(cx, cy - h * 0.22, door_w, door_h, colors["door"])
 
-    # Window
+    # Draws windows
     win_w, win_h = w * 0.2, h * 0.2
     fill_rect_center(cx - w * 0.25, cy + h * 0.1, win_w, win_h, colors["window"])
 
 
 # ---------- draw_tree_near ----------
+#draws the trees near the houses
 def draw_tree_near(cx, cy, size_key):
     """Draw a small tree near the house (left or right)."""
     w, h = SIZES[size_key]
@@ -227,7 +210,7 @@ def draw_village(cols, rows, size_key, theme_key, sun_flag, roof_style):
             draw_house_centered(cx, cy, size_key, theme_key, roof_style)
             draw_tree_near(cx, cy, size_key)
 
-    # Optional sun
+    # Optional sun - draws the sun only of the user requests it
     if sun_flag == 'y':
         r = 35
         cx = CANVAS_W / 2 - r - 12
@@ -236,8 +219,12 @@ def draw_village(cols, rows, size_key, theme_key, sun_flag, roof_style):
 
 
 # ---------- main ----------
+# the main running of the program
 def main():
+    """Main function — get user input, set up the window, and draw the village."""
     print("Welcome to Turtle Village — Lite!")
+
+    #Get valid user choices
     cols = ask_choice_int("How many houses per row?", [2, 3])
     rows = ask_choice_int("How many rows?", [2])
     size_key = ask_choice_str("House size", ["S", "M", "L"]).lower()
@@ -245,17 +232,19 @@ def main():
     roof_style = ask_choice_str("Roof type", ["triangle", "flat"]).lower()
     sun_flag = ask_choice_str("Draw a sun?", ["y", "n"]).lower()
 
-    # Setup window
+    # Setup window and drawing speed
     T.setup(CANVAS_W, CANVAS_H)
     T.speed(0)
-    T.tracer(False)
+    T.tracer(False) # turns off animation for faster processing
 
-    # Draw the village
+    # Draw the village - draws everything from the user input
     draw_village(cols, rows, size_key, theme_key, sun_flag, roof_style)
 
+    # Displays the final scene
     T.tracer(True)
     T.hideturtle()
     T.done()
 
+# ---------- runs the program ----------
 if __name__ == "__main__":
     main()
